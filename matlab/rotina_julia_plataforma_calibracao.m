@@ -42,7 +42,8 @@ end
 
 % Configurando 
 s = daq('ni');
-ch1 = addinput(s,"Dev1","ai0","Voltage");
+%ch1 = addinput(s,"Dev1","ai0","Voltage");
+addinput(s,"Dev2","ai0","Voltage");
 % get(s)
 s.Rate = Fs;
 
@@ -53,10 +54,12 @@ s.Rate = Fs;
 % s.ScansAvailableFcnCount = 
 
 
-hf2 = figure;
-hf2.WindowState = 'maximized';
+hf = figure;
+hf.WindowState = 'maximized';
+
+hf.CloseRequestFcn = @(src,event)myCloseRequestFunction(src,event, s);
 % lh = addlistener(s,'DataAvailable', @(src,event) callbackplot(src,event,hf2,Npm));
-s.ScansAvailableFcn = @(src,event)callbackplot(src,event, hf2);
+s.ScansAvailableFcn = @(src,event)callbackplot(src,event, hf);
 
 % s.NotifyWhenDataAvailableExceeds = Npm;
 s.ScansAvailableFcnCount = Npm;
@@ -96,4 +99,25 @@ ylabel('Peso (N)')
 
 title(['Peso: ' num2str(mean(data))])
 
+end
+
+function myCloseRequestFunction(src, ~ , s)
+% Callback para parar aquisção e fechar a janela, quando o X da janela é
+% clicado
+% disp('  close re')
+% disp(s)
+stop(s)
+delete(src)
+    
+%     % Display a confirmation dialog
+%     selection = uiconfirm(src, 'Are you sure you want to close this figure?', ...
+%         'Confirm Close', 'Options', {'Yes', 'No'}, 'DefaultOption', 1, 'Icon', 'question');
+% 
+%     % Close the figure only if the user confirms
+%     if strcmp(selection, 'Yes')
+%         disp('Figure is closing...');
+%         delete(src); % Delete the figure object
+%     else
+%         disp('Close operation cancelled.');
+%     end
 end
